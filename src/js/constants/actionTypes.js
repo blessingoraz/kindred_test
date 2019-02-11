@@ -1,0 +1,7 @@
+const ActionTypes = {
+  SET_LIVE_MATCHES: 'SET_LIVE_MATCHES',
+  CLEAR_CACHE_MATCHES: 'CLEAR_CACHE_MATCHES',
+  LOADING_MATCHES: 'LOADING_MATCHES'
+};
+export default ActionTypes;
+  
