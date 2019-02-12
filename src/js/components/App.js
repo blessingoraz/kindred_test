@@ -5,11 +5,17 @@ import PropTypes from 'prop-types';
 
 import { getLiveMatches } from '../actions/match';
 
+const CACHE_TIME_IN_SECONDS = 120000;
+
 import Match from './Match';
 
 class App extends Component {
   componentDidMount() {
-    this.props.dispatch(getLiveMatches());
+    const { time } = this.props.matchesStore;
+
+    if(Date.now() > time + CACHE_TIME_IN_SECONDS) {
+      this.props.dispatch(getLiveMatches());
+    } 
   }
   render() {
     const settings = {
@@ -41,7 +47,7 @@ class App extends Component {
 
               <div id="match">
                 <Slider {...settings}>
-                  { Object.values(matches).map(match => 
+                  { matches && Object.values(matches).map(match => 
                     <Match key={match.id} match={match}/>
                   )}
                 </Slider>
@@ -74,7 +80,7 @@ const mapStateToProps = (state) => {
 };
 
 App.propTypes = {
-  // matchesStore: PropTypes.object.isRequired,
+  matchesStore: PropTypes.object.isRequired,
   dispatch: PropTypes.func.isRequired
 };
 

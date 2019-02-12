@@ -1,6 +1,7 @@
 export const initialState = {
   matches: {
     matches: {},
-    loading: true
+    loading: true,
+    time: ''
   }
 };
