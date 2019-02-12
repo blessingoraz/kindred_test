@@ -9,6 +9,8 @@ const reducer = (state = initialState.matches, action) => {
       return { ...state, matches: action.matches };
     case ActionTypes.LOADING_MATCHES:
       return { ...state, loading: action.loading };
+    case ActionTypes.SET_TIME:
+      return { ...state, time: action.time };
     default:
       return state;
   }

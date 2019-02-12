@@ -10,39 +10,29 @@ export function getLiveMatches() {
     return axios.get(`${liveMatchURL}`)
       .then((response) => {
         const { liveEvents } = response.data;
-        let matches = [];
 
-        for(let liveEvent of liveEvents) {
-          let { event, liveData } = liveEvent;
-          let { awayName, homeName, id, sport, start } = event;
-          let { score } = liveData;
+        // Get necessary data from liveEvents object
+        let matches = liveEvents.map(({
+          event : {awayName, homeName, id, sport, start }, 
+          liveData: {
+            score :{ away: awayScore, home: homeScore} = {}
+          }}) => ({
+          start,
+          awayName,
+          homeName,
+          id,
+          sport,
+          awayScore,
+          homeScore
+        }));
 
-          awayName = typeof awayName == 'string' && awayName.trim().length > 0 ? awayName : false;
-          homeName = typeof homeName == 'string' && homeName.trim().length > 0 ? homeName : false;
-          id = typeof id == 'number' && id > 0 ? id : false;
-          sport = typeof sport == 'string' && sport.trim().length > 0 ? sport : false;
-          start = typeof start == 'string' && start.trim().length > 0 ? start : false;
-
-          score = typeof score == 'object' && score !== null ? score : false;
-
-          if(event.state === 'STARTED' && awayName && homeName && id && sport && start && score) {
-            let matchesData = {};
-            matchesData['awayName'] = event.awayName;
-            matchesData['homeName'] = event.homeName;
-            matchesData['id'] = event.id;
-            matchesData['sport'] = event.sport;
-            matchesData['start'] = event.start;
-            matchesData['awayScore'] = liveData.score.away;
-            matchesData['homeScore'] = liveData.score.home;
-
-            matches.push(matchesData);
-          }
-        }
-
+        // Dispatch actions
         dispatch(setLiveMatches(utils.mapMatchesData(matches)));
         dispatch(loadMatches(false));
+        dispatch(setTime());
         return RESPONSE_MESSAGES.SUCCESS;
       }).catch(() => {
+        dispatch(setErrorMessage(RESPONSE_MESSAGES.FAILED_REQUEST));
         return Promise.reject({
           message: RESPONSE_MESSAGES.FAILED_REQUEST,
           response: {
@@ -53,15 +43,34 @@ export function getLiveMatches() {
   };
 }
 
+// Set live matches
 export function setLiveMatches(matches) {
   return {
     type: ActionTypes.SET_LIVE_MATCHES,
     matches
   };
 }
+
+// Set time inorder to cache data for 2mins
+export function setTime() {
+  return {
+    type: ActionTypes.SET_TIME,
+    time: Date.now()
+  };
+}
+
+// Set loading boolean
 export function loadMatches(loading) {
   return {
     type: ActionTypes.LOADING_MATCHES,
     loading
+  };
+}
+
+// Set error messages
+export function setErrorMessage(errorMessage) {
+  return {
+    type: ActionTypes.SET_ERROR_MESSAGE,
+    errorMessage
   };
 }
